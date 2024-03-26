@@ -27,9 +27,18 @@ async function run() {
 
         // volunteer service related api
         app.get('/volunteers', async (req, res) => {
-            const query = {};
-            const volunteers = await volunteersCollection.find(query).toArray();
-            res.send(volunteers);
+            const search = req.query.search;
+            let cursor;
+
+            if (search) {
+                cursor = volunteersCollection.find({ title: { $regex: search, $options: 'i' } });
+            }
+            else {
+                cursor = volunteersCollection.find();
+            }
+            
+            const result = await cursor.toArray();
+            res.send(result);
         });
 
 
