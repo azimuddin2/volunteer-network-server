@@ -23,11 +23,21 @@ const client = new MongoClient(uri, {
 async function run() {
     try {
         const volunteersCollection = client.db('volunteerNetwork').collection('volunteers');
+        const usersCollection = client.db('volunteerNetwork').collection('users');
 
+        // volunteer service related api
         app.get('/volunteers', async (req, res) => {
             const query = {};
             const volunteers = await volunteersCollection.find(query).toArray();
             res.send(volunteers);
+        });
+
+
+        // users related api
+        app.post('/users', async (req, res) => {
+            const userInfo = req.body;
+            const result = await usersCollection.insertOne(userInfo);
+            res.send(result);
         });
 
     }
