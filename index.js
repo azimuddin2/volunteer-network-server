@@ -24,6 +24,7 @@ async function run() {
     try {
         const volunteersCollection = client.db('volunteerNetwork').collection('volunteers');
         const usersCollection = client.db('volunteerNetwork').collection('users');
+        const eventsCollection = client.db('volunteerNetwork').collection('events');
 
         // volunteer service related api
         app.get('/volunteers', async (req, res) => {
@@ -36,7 +37,7 @@ async function run() {
             else {
                 cursor = volunteersCollection.find();
             }
-            
+
             const result = await cursor.toArray();
             res.send(result);
         });
@@ -48,6 +49,28 @@ async function run() {
             const result = await usersCollection.insertOne(userInfo);
             res.send(result);
         });
+
+
+        // event program related api
+        app.post('/events', async (req, res) => {
+            const eventInfo = req.body;
+
+            const query = {
+                title: eventInfo.title,
+                email: eventInfo.email
+            };
+
+            const existingEvent = await eventsCollection.findOne(query);
+            if (existingEvent) {
+                return res.send({ message: 'This event program has already been added.' });
+            }
+            else {
+                const result = await eventsCollection.insertOne(eventInfo);
+                return res.send(result);
+            }
+        });
+
+
 
     }
     finally {
