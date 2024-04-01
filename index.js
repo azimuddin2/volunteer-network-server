@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const app = express();
 const port = process.env.PORT || 5000;
 
@@ -54,7 +54,6 @@ async function run() {
         // event program related api
         app.post('/events', async (req, res) => {
             const eventInfo = req.body;
-
             const query = {
                 title: eventInfo.title,
                 email: eventInfo.email
@@ -68,6 +67,20 @@ async function run() {
                 const result = await eventsCollection.insertOne(eventInfo);
                 return res.send(result);
             }
+        });
+
+        app.get('/events', async (req, res) => {
+            const email = req.query.email;
+            const query = { email: email };
+            const result = await eventsCollection.find(query).toArray();
+            res.send(result);
+        });
+
+        app.delete('/events/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) };
+            const result = await eventsCollection.deleteOne(query);
+            res.send(result);
         });
 
 
